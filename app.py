@@ -1,4 +1,4 @@
-import base64
+# import base64 # Enable this for Cloud Functions
 import os
 import json
 from datetime import datetime, timezone
@@ -76,35 +76,69 @@ def transform(data: dict) -> pd.DataFrame:
 
     transformed_stock = []
 
-    for item in data:
+    for stock in data:
         tmp = {}
 
-        tmp['stock'] = item['stock']
+        tmp['stock'] = stock['stock']
         tmp['updated_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
-        for item in item['result'][0]['table']:
-            name = item['name']
-            value = item['value']
-            value = value.replace(',', '')
+        for item in stock['result'][0]['table']:
+            name = (
+                item['name']
+                .replace('(', 'in_')
+                .replace(')', '')
+                .replace(' ', '_')
+                .replace('/', '_')
+                .replace('-', '_')
+                .replace('.', '')
+            ).lower()
 
-            if '%' in value:
-                value = value.replace('%', '')
+            value = (
+                item['value']
+                .replace(',', '')
+                .replace('%', '')
+            )
 
-            if name == '5Y Net Dividend Growth':
-                tmp['5Y_Net_Dividend_Growth'] = value
-            elif name == 'Dividend Indicated Gross Yield':
-                tmp['Dividend_Indicated_Gross_Yield'] = value
-            elif name == 'Market Cap (M)':
-                tmp['Market_Cap_in_M'] = value
-            elif name == 'Shares Outstanding (M)':
-                tmp['Shares_Outstanding_in_M'] = value
-            elif name == 'Average Volume (30-day)':
-                tmp['Average_Volume_30_day'] = value
+            tmp[name] = value
 
         transformed_stock.append(tmp)
 
     df = pd.DataFrame(transformed_stock)
-    df.columns = map(str.lower, df.columns)
+
+    df['5y_net_dividend_growth'] = df.apply(
+        lambda x: x['5y_net_dividend_growth'] 
+        if pd.isnull(x['5y_net_dividend_growth']) 
+        else float(x['5y_net_dividend_growth'].replace('%', 'e-2')),
+        axis=1
+    )
+
+    df['dividend_indicated_gross_yield'] = df.apply(
+        lambda x: x['dividend_indicated_gross_yield']
+        if pd.isnull(x['dividend_indicated_gross_yield'])
+        else float(x['dividend_indicated_gross_yield'].replace('%', 'e-2')),
+        axis=1
+    )
+
+    df['market_cap_in_m'] = df.apply(
+        lambda x: x['market_cap_in_m']
+        if pd.isnull(x['market_cap_in_m'])
+        else float(x['market_cap_in_m'].replace(',', '')),
+        axis=1
+    )
+
+    df['shares_outstanding_in_m'] = df.apply(
+        lambda x: x['shares_outstanding_in_m']
+        if pd.isnull(x['shares_outstanding_in_m'])
+        else float(x['shares_outstanding_in_m'].replace(',', '')),
+        axis=1
+    )
+
+    df['average_volume_in_30_day'] = df.apply(
+        lambda x: x['average_volume_in_30_day']
+        if pd.isnull(x['average_volume_in_30_day'])
+        else float(x['average_volume_in_30_day'].replace(',', '')),
+        axis=1
+    )
 
     return df
 
