@@ -23,7 +23,7 @@ companies = [
 ]
 
 ## Data destination info
-BQ_PROJECT_DATASET_TABLE = os.getenv(key='BQ_PROJECT_DATASET_TABLE')
+bq_project_dataset_table = os.getenv(key='BQ_PROJECT_DATASET_TABLE')
 
 
 def get_stat(name: str) -> dict:
@@ -116,6 +116,7 @@ def load(df: pd.DataFrame) -> str:
     df_json_object = json.loads(df.to_json(orient='records'))
 
     sa_path = os.path.join(os.getcwd(), "creds", "serverless-sa.json")
+    # bq_client = bigquery.Client() # Enable this for Cloud Functions
     bq_client = bigquery.Client.from_service_account_json(sa_path)
 
     job_config = bigquery.LoadJobConfig(
@@ -129,7 +130,7 @@ def load(df: pd.DataFrame) -> str:
         write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
     )
 
-    table_id = BQ_PROJECT_DATASET_TABLE
+    table_id = bq_project_dataset_table
 
     job = bq_client.load_table_from_json(
         df_json_object, table_id, job_config=job_config
@@ -142,14 +143,14 @@ def load(df: pd.DataFrame) -> str:
 
     return "Success"
 
-def pubsub_entrypoint(event, context=None):
+def hello_pubsub(event, context=None):
     """Triggered from a message on a Cloud Pub/Sub topic.
     Args:
          event (dict): Event payload.
          context (google.cloud.functions.Context): Metadata for the event.
     """
 
-    # pubsub_message = base64.b64decode(event['data']).decode('utf-8')
+    # pubsub_message = base64.b64decode(event['data']).decode('utf-8') # Enable this for Cloud Functions
     pubsub_message = event['data']
     print(pubsub_message)
 
@@ -182,4 +183,4 @@ if __name__ == "__main__":
 
     context = {}
 
-    pubsub_entrypoint(event, context)
+    hello_pubsub(event, context)
