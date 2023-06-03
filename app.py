@@ -32,14 +32,14 @@ def get_stat(name: str) -> dict:
     data = {}
     data['stock'] = name
 
-    url = f"https://{host}/stock/get-statistics"
+    url = f"https://{HOST}/stock/get-statistics"
     querystring = {
         "id":name,
         "template":"STOCK"
     }
     headers = {
         "X-RapidAPI-Key": api_key,
-        "X-RapidAPI-Host": host
+        "X-RapidAPI-Host": HOST
     }
 
     response = requests.request(
@@ -76,15 +76,15 @@ def transform(data: dict) -> pd.DataFrame:
 
     transformed_stock = []
 
-    for stock in data:
+    for item in data:
         tmp = {}
 
-        tmp['stock'] = stock['stock']
+        tmp['stock'] = item['stock']
         tmp['updated_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
-        for item in stock['result'][0]['table']:
+        for stat in item['result'][0]['table']:
             name = (
-                item['name']
+                stat['name']
                 .replace('(', 'in_')
                 .replace(')', '')
                 .replace(' ', '_')
@@ -94,7 +94,7 @@ def transform(data: dict) -> pd.DataFrame:
             ).lower()
 
             value = (
-                item['value']
+                stat['value']
                 .replace(',', '')
                 .replace('%', '')
             )
