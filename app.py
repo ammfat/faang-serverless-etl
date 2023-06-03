@@ -32,14 +32,14 @@ def get_stat(name: str) -> dict:
     data = {}
     data['stock'] = name
 
-    url = "https://bloomberg-market-and-financial-news.p.rapidapi.com/stock/get-statistics"
+    url = f"https://{host}/stock/get-statistics"
     querystring = {
         "id":name,
         "template":"STOCK"
     }
     headers = {
         "X-RapidAPI-Key": api_key,
-        "X-RapidAPI-Host": "bloomberg-market-and-financial-news.p.rapidapi.com"
+        "X-RapidAPI-Host": host
     }
 
     response = requests.request(
