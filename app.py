@@ -11,7 +11,7 @@ from google.cloud import bigquery
 ## Data source info
 load_dotenv('.env')
 api_key = os.getenv(key='RAPIDAPI_API_KEY')
-host = 'bloomberg-market-and-financial-news.p.rapidapi.com'
+HOST = 'bloomberg-market-and-financial-news.p.rapidapi.com'
 
 companies = [
     ("facebook", "meta:us"),
