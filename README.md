@@ -54,3 +54,8 @@ Data source: [RapidAPI Bloomberg](https://rapidapi.com/apidojo/api/bloomberg-mar
     ```
 
 1. Check the BigQuery table and ensure the data successfully loaded.
+
+
+## How to Run (Serverlessly)
+
+Refer to this [Medium article](https://medium.com/google-cloud-indonesia/scheduling-streaming-insert-ke-bigquery-menggunakan-serverless-option-3e54b4825a22) to deploy it on GCP.
