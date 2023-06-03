@@ -199,7 +199,7 @@ def hello_pubsub(event, context=None):
 
     # Load to BigQuery
     rows_to_insert = len(df)
-    print(rows_to_insert, " new record(s) are found")
+    print(f"{rows_to_insert} new record(s) are found")
 
     load_result = load(df)
 
