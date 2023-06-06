@@ -30,12 +30,11 @@ def get_stat(name: str) -> dict:
     """ Get stock statistics from bloomberg api """
 
     data = {}
-    data['stock'] = name
 
     url = f"https://{HOST}/stock/get-statistics"
     querystring = {
-        "id":name,
-        "template":"STOCK"
+        "id": name,
+        "template": "STOCK"
     }
     headers = {
         "X-RapidAPI-Key": api_key,
